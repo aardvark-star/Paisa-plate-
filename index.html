@@ -1,0 +1,294 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Paisa Plate: eat well, spend wisely</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/javascript-lp-solver/0.4.24/solver.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,800&family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#0e0e0c;--s1:#171714;--s2:#201f1b;--bd:#2f2e28;--fg:#f4efe3;--mut:#a29d8e;--gr:#9ccc65;--ye:#f4b942;--or:#f08a3c;--be:#e05a72;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 "DM Sans",system-ui,sans-serif;padding-bottom:70px}
+h1,h2,h3,.disp{font-family:"Bricolage Grotesque","DM Sans",system-ui,sans-serif;font-weight:800;letter-spacing:-.03em;margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:9;background:rgba(14,14,12,.94);border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px))}
+.brand{display:none;font:800 18px "Bricolage Grotesque",sans-serif}
+nav div{display:flex;gap:2px;width:100%;justify-content:space-around}
+nav button{background:none;border:0;padding:10px 8px;color:var(--mut);font-weight:500;font-size:14px;border-bottom:2px solid transparent}
+nav button.cur{color:var(--fg);border-color:var(--ye)}
+@media(min-width:760px){nav{top:0;bottom:auto;border:0;border-bottom:1px solid var(--bd);padding:10px 28px;padding-top:calc(10px + env(safe-area-inset-top,0px))}nav div{width:auto;gap:18px}.brand{display:block}body{padding:60px 0 0}}
+main{max-width:1080px;margin:0 auto;padding:0 20px 40px}
+.view{display:none}.view.on{display:block;animation:in .4s ease both}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.kick{color:var(--ye);font-weight:700;font-size:14px;margin:0 0 14px}
+.hero{padding:44px 0 30px}
+.hero h1{font-size:clamp(3.6rem,16vw,10.5rem);line-height:.86}.hero h1 span{display:block}.hero h1 .g{color:var(--gr)}
+.lead{font-size:clamp(1.1rem,2.4vw,1.45rem);max-width:30em;color:var(--mut);margin:26px 0}
+.cta{background:var(--ye);color:#14130f;border:0;border-radius:4px;padding:16px 28px;font-weight:700;font-size:17px}
+.cta:hover{background:#ffd06b}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:40px}
+.tl{background:var(--s1);border:1px solid var(--bd);border-radius:6px;padding:14px 8px;text-align:center}.tl span{display:block;font-size:clamp(2.2rem,8vw,4rem);line-height:1.2}.tl small{color:var(--mut)}
+@media(min-width:760px){.tiles{grid-template-columns:repeat(8,1fr)}}
+.story{padding:70px 0;border-top:1px solid var(--bd)}.story p{margin:0}.story .a{font:800 clamp(1.5rem,4vw,2.6rem)/1.15 "Bricolage Grotesque",sans-serif;color:var(--mut);max-width:20em}
+.story .b{font:800 clamp(2.2rem,7vw,5rem)/1 "Bricolage Grotesque",sans-serif;letter-spacing:-.03em;margin-top:18px!important;max-width:14em}.story em{font-style:normal;color:var(--gr)}.story em:nth-of-type(2){color:var(--ye)}.story em:nth-of-type(3){color:var(--or)}
+.prog{height:3px;background:var(--bd);margin:26px 0 12px}.prog i{display:block;height:100%;background:var(--ye);width:20%;transition:width .35s}
+.step{color:var(--mut);font-size:14px;margin:0 0 20px}
+.pn{display:none}.pn.on{display:block;animation:in .35s ease both}
+.pn h2{font-size:clamp(2rem,6vw,3.6rem);line-height:1;margin-bottom:26px}
+.huge{display:flex;align-items:baseline;gap:8px;font:800 clamp(4.5rem,20vw,10rem)/1 "Bricolage Grotesque",sans-serif;letter-spacing:-.04em;margin-bottom:14px}
+.huge input{font:inherit;letter-spacing:inherit;color:var(--ye);background:none;border:0;border-bottom:2px solid var(--bd);padding:0;width:3.5ch;border-radius:0}
+.huge span{font-size:.28em;color:var(--mut);letter-spacing:0}
+input[type=range]{width:100%;accent-color:var(--ye)}
+input,select{font:inherit;color:var(--fg);background:var(--s2);border:1px solid var(--bd);border-radius:4px;padding:8px}
+input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(--ye);outline-offset:2px}
+.gg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.gc{background:var(--s1);border:1px solid var(--bd);border-radius:6px;padding:16px}.gc h3{font-size:22px;margin-bottom:10px}
+.gc label{display:flex;justify-content:space-between;align-items:center;color:var(--mut);margin:6px 0;font-size:14px}.gc input{width:84px;text-align:right}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 22px}
+.chip{background:var(--s1);border:1px solid var(--bd);border-radius:6px;padding:10px 14px}.chip.on{background:var(--gr);color:#14130f;border-color:var(--gr);font-weight:700}
+.fc.s1{opacity:.5;text-decoration:line-through;border-color:var(--be)}.fc.s2{border-color:var(--gr);background:#1e2a17}
+.hint{color:var(--mut);font-size:14px;margin:0 0 8px}
+.n2{display:flex;justify-content:space-between;align-items:center;margin-top:34px;gap:10px}.n2 .ghost{background:none;border:1px solid var(--bd);padding:15px 22px;border-radius:4px}
+.err,.warn{border:1px solid var(--or);border-radius:6px;padding:20px;margin:20px 0;background:#241a10}.warn h2{font-size:clamp(1.6rem,4vw,2.4rem);margin-bottom:8px}.err{color:var(--be);border-color:var(--be)}
+.fx{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.sm{color:var(--mut);font-size:13.5px}
+.rh{padding:40px 0 20px}.rh h1{font-size:clamp(2.8rem,10vw,7rem);line-height:.92}
+.bud{padding:20px 0 34px}.bn{font:800 clamp(4rem,16vw,9rem)/1 "Bricolage Grotesque",sans-serif;letter-spacing:-.04em;color:var(--ye)}.bn small{font:400 16px "DM Sans";color:var(--mut);letter-spacing:0;margin-left:10px}
+.bt{height:22px;background:var(--bd);border-radius:3px;overflow:hidden;margin:14px 0 8px}.bt i{display:block;height:100%;width:0;background:var(--ye);transition:width .8s ease}.bl{display:flex;justify-content:space-between;color:var(--mut)}
+h2.sec{font-size:clamp(1.8rem,5vw,3rem);margin:40px 0 16px}
+.mg{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.mc{background:var(--s1);border:1px solid var(--bd);border-radius:6px;padding:18px;animation:in .5s ease both}.mc h3{font-size:24px;margin-bottom:8px}
+.me{font-size:2.6rem;letter-spacing:4px;line-height:1.2}.mc ul{list-style:none;padding:0;margin:8px 0 12px}.mc li{padding:5px 0;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;gap:10px}.mc li span{color:var(--mut);white-space:nowrap}
+.mf{display:flex;gap:14px;color:var(--mut);font-size:14px;flex-wrap:wrap}.mf b{color:var(--fg)}
+.rg{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.rn{background:var(--s1);border:1px solid var(--bd);border-radius:6px;padding:16px;text-align:center}.rn svg{width:96px;height:96px}.rn .v{font:800 24px "Bricolage Grotesque",sans-serif}.rn small{display:block;color:var(--mut)}
+.rn circle{fill:none;stroke-width:7;stroke-linecap:round}.rn .bg{stroke:var(--bd)}.rn .rf{transition:stroke-dashoffset .9s ease}
+.mb{margin:12px 0}.mb div{display:flex;justify-content:space-between}.mb .t{height:8px;background:var(--bd);border-radius:4px;overflow:hidden;margin-top:4px}.mb i{display:block;height:100%;background:var(--gr);width:0;transition:width .8s}
+.why li{margin:10px 0}.why{max-width:42em;padding-left:18px}
+.gd{border-left:3px solid var(--ye);padding:6px 0 6px 16px;color:var(--mut);max-width:42em;margin:30px 0}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.fd{background:var(--s1);border:1px solid var(--bd);border-radius:6px;padding:16px}.fd .em{font-size:3.4rem;line-height:1.1}.fd h3{font-size:20px;margin:6px 0 2px}.fd p{margin:3px 0;font-size:14px;color:var(--mut)}.fd .key{color:var(--gr)}.fd input{width:80px;margin-left:6px}
+textarea{width:100%;font:13px monospace;color:var(--fg);background:var(--s2);border:1px solid var(--bd);border-radius:4px;padding:8px}
+.how h2{font-size:clamp(1.8rem,5vw,3rem);margin:34px 0 8px}.how p{max-width:40em;color:var(--mut)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<nav><b class="brand">Paisa Plate</b><div><button data-v="home" class="cur">Home</button><button data-v="plan">Plan</button><button data-v="foods">Foods</button><button data-v="how">How it works</button></div></nav>
+<main>
+<section class="view on" id="v-home">
+<div class="hero"><p class="kick">A food plan built around your money</p>
+<h1><span>Eat well.</span><span class="g">Spend wisely.</span></h1>
+<p class="lead">Build a personalized meal plan around your budget, calories, and nutritional goals.</p>
+<button class="cta" data-go="plan">Build My Food Plan</button><div class="tiles" id="tiles"></div></div>
+<div class="story"><p class="a">Healthy eating isn't only about knowing what is healthy.</p><p class="b">It's about finding what works with <em>your budget</em>, <em>your goals</em>, and <em>your available food</em>.</p></div>
+</section>
+<section class="view" id="v-plan"><div id="wiz">
+<div class="prog"><i id="pg"></i></div><p class="step" id="stl"></p><div id="err"></div>
+<div class="pn on" data-s="0"><h2>What's your budget?</h2><div class="huge">₹<input id="budget" type="number" inputmode="numeric" value="200"><span>/ day</span></div><input id="budgetR" type="range" min="50" max="600" step="5" value="200" aria-label="Budget"></div>
+<div class="pn" data-s="1"><h2>How much energy do you need?</h2><div class="huge"><input id="kcal" type="number" inputmode="numeric" value="2000"><span>kcal</span></div><input id="kcalR" type="range" min="1000" max="3500" step="50" value="2000" aria-label="Calories">
+<p class="hint" style="margin-top:22px">Meals per day</p><select id="meals"><option>2</option><option selected>3</option><option>4</option><option>5</option></select></div>
+<div class="pn" data-s="2"><h2>What are your nutrition goals?</h2><div class="gg">
+<div class="gc"><h3>Protein</h3><label>Min g<input id="pmin" type="number" value="60"></label><label>Max g<input id="pmax" type="number"></label></div>
+<div class="gc"><h3>Carbohydrates</h3><label>Min g<input id="cmin" type="number" value="200"></label><label>Max g<input id="cmax" type="number" value="320"></label></div>
+<div class="gc"><h3>Fat</h3><label>Min g<input id="fmin" type="number" value="40"></label><label>Max g<input id="fmax" type="number" value="80"></label></div>
+<div class="gc"><h3>Fiber</h3><label>Min g<input id="fib" type="number" value="25"></label></div>
+<div class="gc"><h3>Micronutrients</h3><label>Iron mg<input id="iron" type="number"></label><label>Calcium mg<input id="calcium" type="number"></label><label>Vitamin C mg<input id="vitc" type="number"></label><label>B12 µg<input id="b12" type="number"></label></div></div>
+<p class="sm">These targets are yours to set. Leave a field empty to skip it.</p></div>
+<div class="pn" data-s="3"><h2>What foods do you eat?</h2><div class="chips" id="dch"></div>
+<p class="hint">Allergies (these foods are removed)</p><div class="chips" id="als"></div>
+<p class="hint">Tap a food once to exclude it, twice to mark it as already at home (free in your plan).</p><div class="chips" id="fch"></div></div>
+<div class="pn" data-s="4"><h2>What's important to you?</h2><p class="hint">Pick any that apply. They tune the optimizer's settings.</p><div class="chips" id="prefs"></div></div>
+<div class="n2"><button class="ghost" id="back">Back</button><button class="cta" id="next">Next</button></div></div>
+<div id="out"></div></section>
+<section class="view" id="v-foods"><div class="rh"><p class="kick">The food database</p><h1 class="disp" style="font-size:clamp(2.6rem,9vw,6rem);line-height:.95">What's on the shelf.</h1><p class="lead">Per-serving values come straight from the database the optimizer uses. Edit a price to match your local market.</p></div>
+<div class="chips" id="ff"></div><div class="fgrid" id="fgrid"></div>
+<h2 class="sec">Add a food</h2><p class="sm">JSON with the same fields as the sample. Nutrients are per 100 g; diet is vegan, veg or nonveg.</p><textarea id="addj" rows="5"></textarea><p><button class="chip" id="addb">Add food</button> <span id="addm" class="sm"></span></p></section>
+<section class="view how" id="v-how"><div class="rh"><p class="kick">How it works</p><h1 class="disp" style="font-size:clamp(2.6rem,9vw,6rem);line-height:.95">The math, kept out of sight.</h1></div>
+<h2>You set the goals</h2><p>Budget, calories, protein, carbs, fat, fiber, optional minerals and vitamins, plus what you eat and what you'd rather skip.</p>
+<h2>An optimizer does the sums</h2><p>A mixed-integer linear program picks how many half-servings of each food to buy. It must stay inside your ranges and budget, cap any one food's share of calories, and keep portions practical. Your priorities adjust its settings. Nothing is guessed by AI.</p>
+<h2>If it can't fit, it tells you why</h2><p>It builds the closest plan within budget, finds the budget that would work, and offers one-tap changes.</p>
+<h2>Maths, not medical advice</h2><p>Quantities, costs and nutrient totals are calculated from the food database. Whether a target suits your body is outside what this tool can judge. For health conditions, pregnancy, children or medication, ask a doctor or registered dietitian.</p></section>
+</main><script>
+/* ===== 1. FOOD DATABASE (edit RAW or use the Add food box) ===== */
+const NUT=[['kcal','Calories','kcal'],['protein','Protein','g'],['carbs','Carbohydrates','g'],['fat','Fat','g'],['fiber','Fiber','g'],['iron','Iron','mg'],['calcium','Calcium','mg'],['vitc','Vitamin C','mg'],['b12','Vitamin B12','µg']];
+const COLS=['name','diet','price','serv','kcal','protein','carbs','fat','fiber','iron','calcium','vitc','b12','max','meals','allergens'];
+// name,diet,₹/kg,serving g,kcal,P,C,F,fiber,Fe,Ca,VitC,B12 (per 100 g), max servings, meal tags (b/l/d/s), allergens
+const RAW=[
+['Rice (raw)','vegan',60,60,360,7,79,.6,1,.7,10,0,0,6,'ld',''],
+['Wheat atta','vegan',45,50,340,12,70,1.7,11,4.9,41,0,0,6,'ld','gluten'],
+['Oats','vegan',150,40,380,13,67,7,10,4.7,54,0,0,4,'b','gluten'],
+['Poha','vegan',70,40,350,7,77,1,2,10,20,0,0,4,'bs',''],
+['Besan','vegan',90,30,390,22,58,7,11,5,45,0,0,3,'bs',''],
+['Toor dal','vegan',150,50,340,22,62,1.5,15,3,73,0,0,4,'ld',''],
+['Moong dal','vegan',130,50,345,24,60,1.2,16,4,75,0,0,4,'ld',''],
+['Kala chana','vegan',110,50,360,20,61,5,12,5,200,3,0,4,'lds',''],
+['Rajma','vegan',140,50,330,23,60,1.3,15,5,140,4,0,4,'ld',''],
+['Soya chunks','vegan',120,30,345,52,33,.5,13,20,350,0,0,4,'ld','soy'],
+['Peanuts','vegan',130,30,570,26,16,49,8.5,2,90,0,0,3,'s','peanut'],
+['Milk (toned)','veg',58,200,60,3.1,4.7,3,0,.1,120,1,.5,4,'bs','dairy'],
+['Curd','veg',70,100,62,3.5,4.5,3.5,0,.1,120,1,.4,4,'lds','dairy'],
+['Paneer','veg',360,50,290,18,3,22,0,.2,400,0,.8,3,'ld','dairy'],
+['Eggs (2)','nonveg',130,100,145,12.5,1,10,0,1.8,55,0,1.1,3,'bld','egg'],
+['Chicken breast','nonveg',220,100,120,23,0,2.5,0,.7,10,0,.3,3,'ld',''],
+['Rohu fish','nonveg',250,100,100,17,0,3,0,1,60,0,2,3,'ld','fish'],
+['Potato','vegan',30,100,77,2,17,.1,2.2,.8,12,20,0,4,'bld',''],
+['Tomato','vegan',40,100,20,.9,3.9,.2,1.2,.5,10,14,0,3,'ld',''],
+['Spinach','vegan',40,100,23,2.9,3.6,.4,2.2,2.7,99,28,0,3,'ld',''],
+['Carrot','vegan',50,100,41,.9,10,.2,2.8,.3,33,6,0,3,'ls',''],
+['Cabbage','vegan',30,100,25,1.3,5.8,.1,2.5,.5,40,36,0,3,'ld',''],
+['Banana','vegan',50,100,90,1.1,23,.3,2.6,.3,6,9,0,4,'bs',''],
+['Guava','vegan',60,100,68,2.6,14,1,5.4,.3,18,228,0,3,'s',''],
+['Cooking oil','vegan',140,10,900,0,0,100,0,0,0,0,0,3,'ld','']];
+const DB={foods:RAW.map(r=>Object.fromEntries(COLS.map((c,i)=>[c,r[i]]))),
+ add(f){for(const c of COLS)if(f[c]==null)throw Error('Missing field: '+c);
+  if(!['vegan','veg','nonveg'].includes(f.diet))throw Error('diet must be vegan, veg or nonveg');
+  for(const c of COLS.slice(2,14))if(!isFinite(f[c]))throw Error(c+' must be a number');
+  f.meals=String(f.meals);f.allergens=String(f.allergens);this.foods.push(f)}};
+
+/* ===== 2. INPUT + VALIDATION (preferences map onto the existing model settings) ===== */
+const $=id=>document.getElementById(id),num=id=>{const v=$(id).value;return v===''?null:+v};
+let D='veg',VOV=null;const ST={},PR=new Set(),AL=new Set();
+const Input={read(){const kcal=num('kcal');
+ const r={budget:num('budget'),kcal,meals:+$('meals').value,diet:D=='egg'?'nonveg':D,maxGrams:400,variety:VOV??60,cw:30,
+  t:{protein:{min:num('pmin'),max:num('pmax')},carbs:{min:num('cmin'),max:num('cmax')},fat:{min:num('fmin'),max:num('fmax')},fiber:{min:num('fib'),max:null}},
+  micro:{iron:num('iron'),calcium:num('calcium'),vitc:num('vitc'),b12:num('b12')},
+  allergens:[...AL],ex:Object.keys(ST).filter(n=>ST[n]==1).map(n=>n.toLowerCase())};
+ if(D=='egg')r.ex.push(...DB.foods.filter(f=>f.diet=='nonveg'&&!/egg/i.test(f.name)).map(f=>f.name.toLowerCase()));
+ if(PR.has('budget'))r.cw=10;
+ if(PR.has('protein'))r.t.protein.min=Math.max(r.t.protein.min||0,Math.round(kcal*.2/4));
+ if(PR.has('variety'))r.variety=90;
+ if(PR.has('balanced')){r.t.carbs={min:Math.round(kcal*.45/4),max:Math.round(kcal*.6/4)};r.t.fat={min:Math.round(kcal*.2/9),max:Math.round(kcal*.35/9)}}
+ if(PR.has('waste')){r.cw=85;r.variety=Math.min(r.variety,40)}
+ const e=[];if(!(r.budget>0))e.push('Enter a daily budget above ₹0.');if(!(kcal>=500))e.push('Enter a calorie target of at least 500 kcal.');
+ for(const k in r.t){const {min,max}=r.t[k];if(min!=null&&min<0||max!=null&&max<0)e.push('Targets cannot be negative.');if(min!=null&&max!=null&&min>max)e.push(NUT.find(n=>n[0]==k)[1]+': minimum is higher than maximum.')}
+ return{r,e}}};
+/* ===== 3. CONSTRAINT / OBJECTIVE BUILDER ===== */
+// Decision variable per food: u_i = integer number of half-servings (x_i = u_i/2 servings), so plans use practical portions.
+const DIETS={vegan:['vegan'],veg:['vegan','veg'],nonveg:['vegan','veg','nonveg']};
+function eligible(foods,r){return foods.filter(f=>DIETS[r.diet].includes(f.diet)&&!r.ex.some(e=>f.name.toLowerCase().includes(e))&&!r.allergens.some(a=>f.allergens.split(/[ ,]+/).includes(a)))}
+function bounds(r){const b={kcal:{min:r.kcal,max:r.kcal*1.1}};
+ for(const k in r.t)if(r.t[k].min!=null||r.t[k].max!=null)b[k]=r.t[k];
+ for(const k in r.micro)if(r.micro[k]>0)b[k]={min:r.micro[k]};return b}
+const BIG=20;
+function build(foods,r,o){
+ const B=bounds(r),M={optimize:'obj',opType:'min',constraints:{},variables:{},ints:{}};
+ const share=.6-.4*r.variety/100,wc=1-.8*r.cw/100,wp=.2+.8*r.cw/100,rel=o.relax||new Set();
+ // normalised objective: cost/budget (cost term) + servings/15 (practicality term), so neither dominates by scale
+ foods.forEach((f,i)=>{const g=f.serv/2,v={};v.cost=f.price/1000*g;
+  for(const [k] of NUT)v[k]=f[k]*g/100;
+  v.obj=o.minCost?v.cost:wc*v.cost/r.budget+wp*.5/15;
+  const ub=Math.floor(Math.min(f.max*f.serv,r.maxGrams)/g);
+  v['cap'+i]=1;M.constraints['cap'+i]={max:ub};
+  if(!rel.has('variety')){v['sh'+i]=v.kcal;M.constraints['sh'+i]={max:share*r.kcal}} // variety: no food > share of calories
+  for(const k in B)if(!rel.has(k)){v[k+'_lo']=v[k];v[k+'_hi']=v[k]}
+  if(!o.noBudget)v.bud=v.cost;
+  M.variables['f'+i]=v;M.ints['f'+i]=1});
+ if(!o.noBudget)M.constraints.bud={max:r.budget};
+ for(const k in B){if(rel.has(k))continue;const {min,max}=B[k],ref=min??max,w=(k=='kcal'?1.5:1)*BIG/ref;
+  if(min!=null)M.constraints[k+'_lo']={min};if(max!=null)M.constraints[k+'_hi']={max};
+  if(o.soft){ // goal programming: penalised shortfall/overshoot, normalised by target size
+   if(min!=null)M.variables[k+'_s']={obj:w,[k+'_lo']:1};
+   if(max!=null)M.variables[k+'_o']={obj:w,[k+'_hi']:-1}}}
+ return M}
+
+/* ===== 4. OPTIMIZATION ENGINE (UI-independent; swap this for another solver) ===== */
+const Engine={
+ totals(items){const t={cost:0};NUT.forEach(n=>t[n[0]]=0);items.forEach(it=>{t.cost+=it.cost;NUT.forEach(n=>t[n[0]]+=it.nut[n[0]])});return t},
+ solve(foods,r,o){const r2=solver.Solve(build(foods,r,o));if(!r2.feasible)return null;
+  const items=[];foods.forEach((f,i)=>{const u=Math.round(r2['f'+i]||0);if(u<1)return;const grams=u*f.serv/2,nut={};
+   NUT.forEach(n=>nut[n[0]]=f[n[0]]*grams/100);items.push({f,u,servings:u/2,grams,cost:grams*f.price/1000,nut})});
+  return{items,tot:this.totals(items)}},
+ optimize(all,r){const foods=eligible(all,r),out={n:foods.length,b:bounds(r)};
+  if(foods.length<4){out.status='error';return out}
+  const p=this.solve(foods,r,{});if(p){out.status='ok';out.plan=p;return out}
+  out.status='infeasible';out.plan=this.solve(foods,r,{soft:true});
+  const nb=this.solve(foods,r,{noBudget:true,minCost:true});
+  if(nb)out.suggest=Math.ceil(nb.tot.cost/5)*5;
+  const keys=[...Object.keys(out.b),'variety'];
+  out.culprits=keys.filter(k=>this.solve(foods,r,{relax:new Set([k])}));
+  out.hardCulprits=nb?[]:keys.filter(k=>this.solve(foods,r,{relax:new Set([k]),noBudget:true,minCost:true}));
+  return out}};
+
+/* ===== 5. RESULT FORMATTER ===== */
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const f0=(n,d=0)=>Number(n).toLocaleString('en-IN',{minimumFractionDigits:d,maximumFractionDigits:d}),lab=k=>k=='variety'?'variety limit':(NUT.find(n=>n[0]==k)||[0,k])[1].toLowerCase(),unit=k=>NUT.find(n=>n[0]==k)[2];
+const EM=[[/rice/i,'🍚'],[/atta|roti|chapati/i,'🫓'],[/oats|curd/i,'🥣'],[/poha/i,'🍛'],[/besan/i,'🌾'],[/dal/i,'🍲'],[/chana|rajma/i,'🫘'],[/soya|tofu/i,'🌱'],[/peanut/i,'🥜'],[/milk/i,'🥛'],[/paneer/i,'🧀'],[/egg/i,'🥚'],[/chicken/i,'🍗'],[/fish/i,'🐟'],[/potato/i,'🥔'],[/tomato/i,'🍅'],[/spinach|cabbage/i,'🥬'],[/carrot/i,'🥕'],[/banana/i,'🍌'],[/guava/i,'🍈'],[/oil/i,'🫒']];
+const em=n=>(EM.find(e=>e[0].test(n))||[0,'🍽️'])[1],short=n=>n.replace(/\s*\(.*\)/,'');
+function mealPlan(plan,n){
+ const S={2:[['Lunch','l',.5],['Dinner','d',.5]],3:[['Breakfast','b',.3],['Lunch','l',.4],['Dinner','d',.3]],4:[['Breakfast','b',.25],['Lunch','l',.35],['Snack','s',.1],['Dinner','d',.3]],5:[['Breakfast','b',.25],['Snack','s',.1],['Lunch','l',.3],['Snack','s',.1],['Dinner','d',.25]]}[n];
+ const sl=S.map(s=>({n:s[0],t:s[1],tg:s[2]*plan.tot.kcal,k:0,m:{}}));
+ [...plan.items].sort((a,b)=>b.nut.kcal-a.nut.kcal).forEach(it=>{for(let j=0;j<it.u;j++){
+  let c=sl.filter(s=>it.f.meals.includes(s.t));if(!c.length)c=sl;
+  const s=c.reduce((a,b)=>b.tg-b.k>a.tg-a.k?b:a);s.k+=it.nut.kcal/it.u;s.m[it.f.name]=(s.m[it.f.name]||0)+1}});
+ return sl}
+function why(it,plan,B){const ps=Object.keys(B).filter(k=>k!='kcal').map(k=>[k,it.nut[k]/(B[k].min??B[k].max)]).filter(x=>x[1]>=.08).sort((a,b)=>b[1]-a[1]).slice(0,2);
+ const sp=it.cost/plan.tot.cost*100,kc=it.nut.kcal/plan.tot.kcal*100,nm=short(it.f.name),fr=it.cost==0?' It is already at home, so it costs nothing.':'';
+ return ps.length?`${nm} covers ${ps.map(p=>f0(p[1]*100)+'% of your '+lab(p[0])+' target').join(' and ')} for ${f0(sp)}% of the spend.${fr}`:`${nm} supplies ${f0(kc)}% of your calories for ${f0(sp)}% of the spend, which keeps the total low.${fr}`}
+const RC={kcal:'--ye',protein:'--gr',carbs:'--or',fat:'--be',fiber:'--gr'};
+function ring(k,B,t){const b=B[k],nm=NUT.find(n=>n[0]==k),v=t[k];
+ if(!b)return`<div class="rn"><div class="v">${f0(v)}${nm[2]}</div><small>${nm[1]}</small></div>`;
+ const ref=b.min??b.max,pc=v/ref,C=213.6,bad=b.min!=null&&v<b.min-.5||b.max!=null&&v>b.max+.5;
+ return`<div class="rn"><svg viewBox="0 0 80 80" role="img" aria-label="${nm[1]} ${f0(pc*100)}%"><circle class="bg" cx="40" cy="40" r="34"/><circle class="rf" cx="40" cy="40" r="34" transform="rotate(-90 40 40)" stroke="var(${bad?'--or':RC[k]})" style="stroke-dasharray:${C};stroke-dashoffset:${C}" data-off="${C*(1-Math.min(pc,1))}"/></svg><div class="v"><span class="cu" data-n="${v}">${f0(v)}</span> ${nm[2]}</div><small>${nm[1]}: ${b.min!=null?'goal ≥ '+f0(b.min):''}${b.min!=null&&b.max!=null?', ':''}${b.max!=null?'max '+f0(b.max):''}${bad?' ⚠':''}</small></div>`}
+function infeasible(r,res){const p=res.plan,B=res.b,t=p.tot,cu=res.suggest?res.culprits:res.hardCulprits;
+ const gaps=Object.keys(B).filter(k=>B[k].min!=null&&t[k]<B[k].min-.5).map(k=>`${lab(k)} (${f0(t[k]/B[k].min*100)}% of target)`);
+ const fx=[];if(res.suggest)fx.push(['budget:'+res.suggest,`Raise budget to ₹${res.suggest}`]);
+ fx.push(['kcal',`Lower calories to ${Math.round(r.kcal*.85/50)*50} kcal`]);
+ cu.filter(k=>!['kcal','variety'].includes(k)).forEach(k=>fx.push(['min:'+k,`Lower ${lab(k)} target by 25%`]));
+ if(cu.includes('variety'))fx.push(['variety','Allow fewer foods per plan']);
+ return`<div class="warn"><h2>Your current budget can't meet all of these goals.</h2><p>At ₹${f0(r.budget)}, the closest plan ${gaps.length?'falls short on '+gaps.join(' and '):'misses some of your ranges'}.${res.suggest?` Meeting every target would take about ₹${res.suggest} a day.`:' With the foods allowed, no budget would meet every target together.'}</p><div class="fx">${fx.map(x=>`<button class="chip" data-fx="${x[0]}">${x[1]}</button>`).join('')}<button class="chip" data-v="foods">Add or un-exclude foods</button><button class="chip" onclick="edit()">Change my answers</button></div><p class="sm">The figures above are calculated by the optimizer from the food database. They say nothing about whether a target is right for you.</p></div>`}
+function render(r,res){
+ if(res.status=='error')return`<div class="warn"><h2>Not enough foods to work with.</h2><p>Only ${res.n} foods match your diet, allergy and exclusion choices. Loosen them or add foods to the database.</p><button class="cta" onclick="edit()">Change my answers</button></div>`;
+ const p=res.plan,B=res.b,t=p.tot,ok=res.status=='ok',left=r.budget-t.cost,srt=[...p.items].sort((a,b)=>b.cost-a.cost||b.nut.kcal-a.nut.kcal);
+ let h=ok?'':infeasible(r,res);
+ h+=`<div class="rh"><p class="kick">${ok?'Every target met':'Closest plan within budget'}</p><h1>${ok?"Here's what your budget can do.":"Here's how far your budget goes."}</h1></div>
+<div class="bud"><div class="bn">₹<span class="cu" data-n="${t.cost}">${f0(t.cost)}</span><small>spent of ₹${f0(r.budget)}</small></div><div class="bt"><i data-w="${Math.min(t.cost/r.budget*100,100)}%"></i></div><div class="bl"><span>₹${f0(t.cost)} spent</span><span>₹${f0(left)} remaining</span></div></div>
+<h2 class="sec">Your day on a plate</h2><div class="mg">${mealPlan(p,r.meals).map(s=>{const ns=Object.keys(s.m);let c=0,pr=0;
+  const li=ns.map(n=>{const i=p.items.find(x=>x.f.name==n),fr=s.m[n]/i.u;c+=i.cost*fr;pr+=i.nut.protein*fr;return`<li><b>${esc(short(n))}</b><span>${s.m[n]/2} serving${s.m[n]>2?'s':''} · ${f0(s.m[n]*i.f.serv/2)} g</span></li>`}).join('');
+  return`<div class="mc"><h3>${s.n}</h3><div class="me">${ns.map(n=>em(n)).join('')||'·'}</div><ul>${li||'<li><span>Nothing assigned</span></li>'}</ul><div class="mf"><span><b>₹${f0(c)}</b> cost</span><span><b>${f0(s.k)}</b> kcal</span><span><b>${f0(pr)} g</b> protein</span></div></div>`}).join('')}</div>
+<h2 class="sec">Your nutrition</h2><div class="rg">${['kcal','protein','carbs','fat','fiber'].map(k=>ring(k,B,t)).join('')}</div>
+${['iron','calcium','vitc','b12'].filter(k=>B[k]).map(k=>{const b=B[k],pc=t[k]/b.min*100;return`<div class="mb"><div><span>${NUT.find(n=>n[0]==k)[1]}</span><span>${f0(t[k],1)} / ${f0(b.min)} ${unit(k)}${pc<99.5?' ⚠':''}</span></div><div class="t"><i data-w="${Math.min(pc,100)}%"></i></div></div>`}).join('')}
+<h2 class="sec">Why these foods</h2><ul class="why">${srt.map(i=>`<li>${em(i.f.name)} ${esc(why(i,p,B))}</li>`).join('')}</ul>
+<p class="sm" style="max-width:42em">The optimizer chose from ${res.n} foods. It balanced cost against simplicity, kept every nutrient inside your ranges, limited any one food to ${f0(60-.4*r.variety)}% of calories for variety, and used half-serving steps so portions stay practical.</p>
+<div class="gd"><b>Calculated vs. general guidance.</b> Quantities, costs and nutrient totals are calculated from the food database. Your targets are your inputs, and this tool can't tell whether they suit your health. Talk to a doctor or registered dietitian if you have a condition, are pregnant, or plan big changes.</div>
+<button class="cta" onclick="edit()">Change my answers</button> <button class="chip" data-v="foods">Browse foods</button>`;
+ return h}
+function anim(root){root.querySelectorAll('.cu').forEach(e=>{const n=+e.dataset.n,t0=performance.now();if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+ (function tick(t){const p=Math.min((t-t0)/700,1);e.textContent=f0(n*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(tick)})(t0)});
+ setTimeout(()=>{root.querySelectorAll('[data-off]').forEach(e=>e.style.strokeDashoffset=e.dataset.off);root.querySelectorAll('[data-w]').forEach(e=>e.style.width=e.dataset.w)},60)}
+
+/* ===== 6. UI ===== */
+function view(v){document.querySelectorAll('.view').forEach(e=>e.classList.toggle('on',e.id=='v-'+v));document.querySelectorAll('nav [data-v]').forEach(b=>b.classList.toggle('cur',b.dataset.v==v));scrollTo(0,0)}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-v],[data-go],[data-fx]');if(!b)return;
+ if(b.dataset.v)view(b.dataset.v);else if(b.dataset.go)view(b.dataset.go);
+ else{const [a,k]=b.dataset.fx.split(':');
+  if(a=='budget'){$('budget').value=k;$('budgetR').value=k}
+  else if(a=='kcal'){const v=Math.round(num('kcal')*.85/50)*50;$('kcal').value=v;$('kcalR').value=v}
+  else if(a=='min'){const id={protein:'pmin',carbs:'cmin',fat:'fmin',fiber:'fib'}[k]||k;$(id).value=Math.round(num(id)*.75*10)/10}
+  else if(a=='variety')VOV=15;
+  run()}});
+let step=0;const SN=5;
+function go(i){step=Math.max(0,Math.min(SN-1,i));document.querySelectorAll('.pn').forEach(p=>p.classList.toggle('on',+p.dataset.s===step));$('pg').style.width=(step+1)/SN*100+'%';$('stl').textContent=`Question ${step+1} of ${SN}`;$('back').style.visibility=step?'visible':'hidden';$('next').textContent=step==SN-1?'Build my plan':'Next'}
+$('next').onclick=()=>step==SN-1?run():go(step+1);$('back').onclick=()=>go(step-1);
+function edit(){$('out').innerHTML='';$('wiz').style.display='';go(0);scrollTo(0,0)}
+function bind(n,rg){const w=()=>$(n).style.width=Math.max(($(n).value||'0').length,1)+.4+'ch';$(rg).oninput=()=>{$(n).value=$(rg).value;w()};$(n).oninput=()=>{$(rg).value=$(n).value;w()};w()}
+bind('budget','budgetR');bind('kcal','kcalR');
+function chipRow(id,items,isOn,tog,cls=''){$(id).innerHTML=items.map(([k,l])=>`<button class="chip ${cls} ${isOn(k)}" data-k="${esc(k)}">${l}</button>`).join('');$(id).querySelectorAll('button').forEach(b=>b.onclick=()=>{tog(b.dataset.k);drawChips()})}
+function drawChips(){
+ chipRow('dch',[['vegan','Vegan'],['veg','Vegetarian'],['egg','Eggs'],['nonveg','Non-vegetarian']],k=>D==k?'on':'',k=>D=k);
+ chipRow('als',['gluten','dairy','egg','peanut','soy','fish'].map(a=>[a,a[0].toUpperCase()+a.slice(1)]),k=>AL.has(k)?'on':'',k=>AL.has(k)?AL.delete(k):AL.add(k));
+ chipRow('fch',DB.foods.map(f=>[f.name,em(f.name)+' '+short(f.name)]),k=>'s'+(ST[k]||0),k=>{ST[k]=((ST[k]||0)+1)%3;if(ST[k]==2)PR.add('pantry')},'fc');
+ chipRow('prefs',[['budget','Stay within my budget'],['protein','Higher protein'],['variety','More variety'],['pantry','Use foods I already have'],['balanced','Balanced nutrition'],['waste','Minimize food waste']],k=>PR.has(k)?'on':'',k=>PR.has(k)?PR.delete(k):PR.add(k))}
+function run(){const {r,e}=Input.read();
+ if(typeof solver==='undefined')e.push('The solver library could not load. Check your connection and reload.');
+ $('err').innerHTML=e.length?`<div class="err">${e.map(esc).join('<br>')}</div>`:'';if(e.length){view('plan');return}
+ $('wiz').style.display='none';$('out').innerHTML='<p class="sm" style="padding:60px 0">Working out your plan…</p>';view('plan');
+ setTimeout(()=>{const foods=DB.foods.map(f=>PR.has('pantry')&&ST[f.name]==2?{...f,price:0}:f);
+  $('out').innerHTML=render(r,Engine.optimize(foods,r));anim($('out'))},30)}
+let FF='all';
+function foodsView(){const key=f=>{const R={protein:60,fiber:25,iron:17,calcium:1000,vitc:80,b12:2.4};const b=Object.keys(R).map(k=>[k,f[k]*f.serv/100/R[k]]).sort((a,b)=>b[1]-a[1])[0];return b[1]>=.08?`Rich in ${lab(b[0])}: ${f0(b[1]*100)}% of a typical day's reference`:'Mostly energy'};
+ $('ff').innerHTML=[['all','All'],['vegan','Vegan'],['veg','Vegetarian'],['nonveg','Non-veg']].map(([k,l])=>`<button class="chip ${FF==k?'on':''}" data-f="${k}">${l}</button>`).join('');
+ $('ff').querySelectorAll('button').forEach(b=>b.onclick=()=>{FF=b.dataset.f;foodsView()});
+ $('fgrid').innerHTML=DB.foods.map((f,i)=>[f,i]).filter(([f])=>FF=='all'||f.diet==FF).map(([f,i])=>`<article class="fd"><div class="em">${em(f.name)}</div><h3>${esc(f.name)}</h3><p>₹${f0(f.price*f.serv/1000,1)} per ${f.serv} g serving</p><p>${f0(f.kcal*f.serv/100)} kcal · ${f0(f.protein*f.serv/100,1)} g protein</p><p class="key">${key(f)}</p><p><label>₹/kg<input type="number" value="${f.price}" onchange="DB.foods[${i}].price=+this.value"></label></p></article>`).join('')}
+$('addj').value=JSON.stringify({name:'Tofu',diet:'vegan',price:280,serv:100,kcal:76,protein:8,carbs:2,fat:4.8,fiber:.3,iron:5.4,calcium:350,vitc:0,b12:0,max:3,meals:'ld',allergens:'soy'});
+$('addb').onclick=()=>{try{DB.add(JSON.parse($('addj').value));$('addm').textContent='Added.';foodsView();drawChips()}catch(x){$('addm').textContent='Could not add: '+x.message}};
+$('tiles').innerHTML=['Rice (raw)','Toor dal','Eggs (2)','Paneer','Banana','Peanuts','Spinach','Curd'].map(n=>`<div class="tl"><span>${em(n)}</span><small>${short(n).replace(' (raw)','')}</small></div>`).join('');
+drawChips();foodsView();go(0);
+
+</script></body></html>
